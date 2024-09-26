@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -30,6 +30,8 @@ public class EventService {
     private AmazonS3 s3Client;
     @Autowired
     private EventRepository repository;
+    @Autowired
+    private AddressService addressService;
     public Event creatEvent(EventRequestDTO data){
         String imgUrl = "";
 
@@ -47,6 +49,10 @@ public class EventService {
         newEvent.setRemote(data.remote());
 
         repository.save(newEvent);
+
+        if(!data.remote()) {
+            this.addressService.createAddress(data, newEvent);
+        }
 
         return newEvent;
 
